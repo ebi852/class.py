@@ -1,1 +1,0 @@
-# tarjome.class.py
