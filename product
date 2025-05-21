@@ -1,0 +1,436 @@
+#pyton
+
+
+from tkinter import *
+import string
+import tkinter as tk
+import sqlite3
+import hashlib
+import random
+
+from datetime import datetime
+
+import turtle
+
+
+def ramzbesaz():
+    h = string.ascii_letters + string.digits
+    return ''.join(random.choice(h) for _ in range(4))
+
+ramz = ramzbesaz()
+
+def ramzhash(passw):
+    return hashlib.sha256(passw.encode()).hexdigest()
+
+def vorood():
+    user = k1.get()
+    pas = k2.get()
+    
+    c = k3.get()
+    ph = ramzhash(pas)
+    try:
+        
+        db = sqlite3.connect("ebi.db")
+        
+        cur = db.cursor()
+        
+        cur.execute("SELECT * FROM SITE WHERE user=? AND pas=?", (user, ph))
+        
+        res = cur.fetchall()
+        
+        db.close()
+    except:
+        
+        return
+    
+    
+    n.config(text="")
+    
+    if not res:
+        
+        n.config(text="nist")
+    elif c == ramz:
+        
+        n.config(text="welcome")
+        def k():
+            
+            def func1():
+                conn = sqlite3.connect("notes.db")
+                cur = conn.cursor()
+
+                cur.execute("CREATE TABLE IF NOT EXISTS notes (id INTEGER PRIMARY KEY, onvan TEXT)")
+
+                conn.commit()
+
+
+                def n():
+                    cur.execute("SELECT id, onvan FROM notes ORDER BY id DESC LIMIT 1")
+                    la = cur.fetchone()
+                    
+                    if la:
+                        l1.config(text=f"Last: {la[1]}")
+
+                def z():
+                    title = e.get().strip()
+                    if title:
+                        cur.execute("INSERT INTO notes (onvan) VALUES (?)", (title,))
+                        conn.commit()
+                        
+                        e.delete(0, tk.END)
+                        n()
+
+                w = tk.Tk()
+                w.geometry("500x250")
+                
+                w.config(bg="gray25")
+                
+                w.resizable(False, False)
+
+                t1 = tk.Text(w, height=5, width=40, font=("arial", 12), fg="black", bg="white", bd=0)
+                t1.place(x=30, y=70)
+
+                t1.insert(tk.END, "b nvis")
+                
+
+                l1 = tk.Label(w, text="Last: None", font=("arial", 12), fg="white", bg="gray25")
+                l1.place(x=30, y=180)
+                
+
+                e = tk.Entry(w, width=40, font=("arial", 12))
+                e.place(x=30, y=45)
+
+                b1 = tk.Button(w, text="save", font=("arial", 12), bg="black", fg="white", command=z)
+                b1.place(x=30, y=210)
+                
+
+                n()
+
+                w.mainloop()
+
+
+                conn.close()
+
+
+           
+            def func2():
+                
+                
+                def saat():
+                    
+                    t = datetime.now()
+                    
+                    l.config(text=f"Saat: {t.hour}")
+
+                def daghighe():
+                    
+                    t = datetime.now()
+                    
+                    l.config(text=f"Daghighe: {t.minute}")
+
+                def saniye():
+                    
+                    
+                    t = datetime.now()
+                    
+                    l.config(text=f"Saniye: {t.second}")
+
+                def hame():
+                    
+                    t = datetime.now()
+                    
+                    l.config(text=f"{t.hour}:{t.minute}:{t.second}")
+
+                root2 = Tk()
+                root2.geometry("400x200")
+                root2.config(bg="gray25")
+
+
+                b1 = Button(root2, text="Saat", font=("arial", 12), command=saat)
+                b1.place(x=10, y=20)
+
+                b2 = Button(root2, text="Daghighe", font=("arial", 12), command=daghighe)
+                b2.place(x=10, y=60)
+
+
+                b3 = Button(root2, text="Saniye", font=("arial", 12), command=saniye)
+                b3.place(x=10, y=100)
+
+
+                b4 = Button(root2, text="Hame", font=("arial", 12), command=hame)
+                b4.place(x=10, y=140)
+
+                l = Label(root2, text="", font=("arial", 20), fg="white", bg="gray25")
+                l.place(x=250, y=80)
+
+                root2.mainloop()
+                
+
+           
+            def func3():
+                
+                def k(x):
+                    message = ""
+
+                    if x == s:
+                        message = "bordi, afarin!"
+                    else:
+                        message = "na dorost nabood!"
+
+                    w = tk.Toplevel(f)
+                    w.title("natije")
+                    w.geometry("300x150")
+                    w.config(bg="gray25")
+
+                    label = tk.Label(w, text=message, font=("arial", 14), fg="white", bg="gray25")
+                    label.place(x=80, y=30)
+                    
+
+                    button = tk.Button(w, text="ok", font=("arial", 12), bg="black", fg="white", command=w.destroy)
+                    button.place(x=110, y=90)
+                    
+
+                s = random.randint(1, 9)
+
+                f = tk.Tk()
+                f.title("hads bezan")
+                f.geometry("400x400")
+                f.config(bg="gray25")
+                f.resizable(False, False)
+                
+
+                b1 = tk.Button(f, text="1", font=("arial", 14), bg="black", fg="white", command=lambda: k(1))
+                b1.place(x=30, y=30, width=80, height=80)
+
+
+                b2 = tk.Button(f, text="2", font=("arial", 14), bg="black", fg="white", command=lambda: k(2))
+                b2.place(x=140, y=30, width=80, height=80)
+
+                b3 = tk.Button(f, text="3", font=("arial", 14), bg="black", fg="white", command=lambda: k(3))
+                b3.place(x=250, y=30, width=80, height=80)
+
+
+
+                b4 = tk.Button(f, text="4", font=("arial", 14), bg="black", fg="white", command=lambda: k(4))
+                b4.place(x=30, y=140, width=80, height=80)
+
+
+                b5 = tk.Button(f, text="5", font=("arial", 14), bg="black", fg="white", command=lambda: k(5))
+                b5.place(x=140, y=140, width=80, height=80)
+
+
+                b6 = tk.Button(f, text="6", font=("arial", 14), bg="black", fg="white", command=lambda: k(6))
+                b6.place(x=250, y=140, width=80, height=80)
+
+                b7 = tk.Button(f, text="7", font=("arial", 14), bg="black", fg="white", command=lambda: k(7))
+                b7.place(x=30, y=250, width=80, height=80)
+
+
+                b8 = tk.Button(f, text="8", font=("arial", 14), bg="black", fg="white", command=lambda: k(8))
+                b8.place(x=140, y=250, width=80, height=80)
+
+
+                b9 = tk.Button(f, text="9", font=("arial", 14), bg="black", fg="white", command=lambda: k(9))
+                b9.place(x=250, y=250, width=80, height=80)
+
+
+
+                f.mainloop()
+
+
+
+            
+            
+            def func4():
+                w85 = turtle.Screen()
+                w85.title("EBI")
+                w85.bgcolor("gray25")
+                w85.setup(500, 250)
+
+                t = turtle.Turtle()
+                t.color("white")
+                t.penup()
+                t.goto(0, 0)
+                t.write("Ebi", align="center", font=("Arial", 48, "bold"))
+
+                t.goto(0, -30)
+                t.pendown()
+                t.pensize(3)
+                t.speed(0)
+
+                t.ondrag(t.goto)
+
+                w85.mainloop()
+
+            root = Tk()
+            root.geometry("400x400")
+            root.title("EBI")
+            root.config(bg='gray25')
+
+            b1 = Button(root, text="suprize1",font=("arial", 12), command=func1)
+            
+            b2 = Button(root, text="suprize2",font=("arial", 12), command=func2)
+            
+            b3 = Button(root, text="suprize3",font=("arial", 12), command=func3)
+            
+            b4 = Button(root, text="suprize4",font=("arial", 12), command=func4)
+
+
+
+            b1.place(x=50, y=50)
+            b2.place(x=150, y=50)
+            b3.place(x=50, y=100)
+            b4.place(x=150, y=100)
+            
+            
+
+            root.mainloop()
+        k()
+    else:
+        n.config(text="code")
+
+def sabtenam():
+    db = sqlite3.connect("ebi.db")
+    cur = db.cursor()
+    cur.execute("CREATE TABLE IF NOT EXISTS SITE (name text, lastname text, gender text, gmail text, user text, pas text)")
+    db.commit()
+    db.close()
+
+    jens = StringVar(value="mard")
+
+    def zakhire():
+        
+        
+        name = s1.get()
+        lastname = s2.get()
+        gender = jens.get()
+        email = s3.get()
+        user = s4.get()
+        pas = s5.get()
+        ph = ramzhash(pas)
+        try:
+            
+            
+            db = sqlite3.connect("ebi.db")
+            cur = db.cursor()
+            cur.execute("INSERT INTO SITE VALUES (?, ?, ?, ?, ?, ?)", (name, lastname, gender, email, user, ph))
+            db.commit()
+            db.close()
+        except:
+            
+            pass
+
+
+    top = Toplevel(r)
+    top.geometry("500x500")
+    top.config(bg='gray25')
+    
+
+    name3 = Label(top, text='name:', font=('arial', 15))
+    name3.place(x=10, y=10)
+    
+    lastname3 = Label(top, text='lastname:', font=('arial', 15))
+    lastname3.place(x=10, y=60)
+    
+    
+    gender3 = Label(top, text='gender:', font=('arial', 15))
+    gender3.place(x=10, y=110)
+    
+    email3 = Label(top, text='email:', font=('arial', 15))
+    email3.place(x=10, y=160)
+    
+    user3 = Label(top, text='user:', font=('arial', 15))
+    user3.place(x=10, y=210)
+    
+    pas3 = Label(top, text='pas:', font=('arial', 15))
+    pas3.place(x=10, y=260)
+    
+
+    s1 = Entry(top, font=('arial', 15))
+    s1.place(x=100, y=10)
+    
+
+    s2 = Entry(top, font=('arial', 15))
+    s2.place(x=120, y=60)
+
+    
+    
+    
+    gende = StringVar(value="mard")
+
+    ma = Radiobutton(top, text='mard', font=('arial', 10), variable=gende, value='mard')
+    ma.place(x=100, y=110)
+
+
+    zan = Radiobutton(top, text='zan', font=('arial', 10), variable=gende, value='zan')
+    zan.place(x=170, y=110)
+
+
+    s3 = Entry(top, font=('arial', 15))
+    s3.place(x=100, y=160)
+
+
+
+    s4 = Entry(top, font=('arial', 15))
+    s4.place(x=100, y=210)
+
+
+    s5 = Entry(top, font=('arial', 15), show='*')
+    s5.place(x=100, y=260)
+
+
+    o = Button(top, text='ok', font=('arial', 15), bg='black', fg='white', command=zakhire)
+    o.place(x=200, y=320)
+
+
+
+
+
+
+r = Tk()
+r.geometry("400x400")
+r.config(bg='gray25')
+
+userl = Label(r, text='user:', font=('arial', 15))
+userl.place(x=10, y=10)
+
+
+
+
+pasl = Label(r, text='pas:', font=('arial', 15))
+pasl.place(x=10, y=60)
+
+
+ramzl = Label(r, text=ramz, font=('arial', 15))
+ramzl.place(x=10, y=110)
+
+
+
+k1 = Entry(r, font=('arial', 15))
+k1.place(x=100, y=10)
+
+k2 = Entry(r, font=('arial', 15), show='*')
+k2.place(x=100, y=60)
+
+
+
+k3 = Entry(r, font=('arial', 15))
+k3.place(x=100, y=110)
+
+
+n = Label(r, text='', font=('arial', 15))
+n.place(x=10, y=330)
+
+
+enter = Button(r, text='inter', font=('arial', 15), bg='black', fg='white', command=vorood)
+enter.place(x=50, y=250)
+
+
+updat = Button(r, text='update', font=('arial', 15), bg='black', fg='white', command=sabtenam)
+updat.place(x=200, y=250)
+
+
+
+
+
+
+r.mainloop()
