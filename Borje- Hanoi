@@ -1,0 +1,253 @@
+import tkinter as tk
+
+
+class HanoiSolver:
+    def solve(self, n, source, target, auxiliary, callback):
+        if n == 0:
+            return
+        self.solve(n - 1, source, auxiliary, target, callback)
+        callback(source, target)
+        self.solve(n - 1, auxiliary, target, source, callback)
+
+
+class MenuScreen:
+    def __init__(self, root, on_select):
+        self.frame = tk.Frame(root, bg="white")
+        self.frame.place(x=0, y=0, width=1000, height=620)
+
+        
+        tk.Label(
+            self.frame,
+            text="Borje- Hanoi",
+            font=("Arial", 30, "bold"),
+            bg="white"
+        ).place(x=500, y=30, anchor="n")
+
+        
+        tk.Label(
+            self.frame,
+            text="Formul: 2^n - 1 harkat lazem dare",
+            font=("Arial", 13),
+            bg="white",
+            fg="#555"
+        ).place(x=500, y=85, anchor="n")
+
+        
+        tk.Label(
+            self.frame,
+            text="Hadaf: enteqale hame diskha az mile A be mile C\nQanun: diske bozorgtar nemitune ru diske kuchiktar bashe",
+            font=("Arial", 11),
+            bg="white",
+            fg="#888",
+            justify="center"
+        ).place(x=500, y=120, anchor="n")
+
+        
+        tk.Label(
+            self.frame,
+            text="Tedade disk ro entekhab konid, lotfan:",
+            font=("Arial", 13),
+            bg="white",
+            fg="#444"
+        ).place(x=500, y=175, anchor="n")
+
+        
+        options = [
+            (2, "2 Disk", "Asoon  —  3 harkat"),
+            (3, "3 Disk", "Asoon  —  7 harkat"),
+            (4, "4 Disk", "Motevaset  —  15 harkat"),
+            (5, "5 Disk", "Motevaset  —  31 harkat"),
+            (6, "6 Disk", "Sakht  —  63 harkat"),
+            (7, "7 Disk", "Sakht  —  127 harkat"),
+            (8, "8 Disk", "Herfei  —  255 harkat"),
+        ]
+
+        start_y = 215
+        row_h = 52
+
+        for i, (n, label, desc) in enumerate(options):
+            y = start_y + i * row_h
+            tk.Button(
+                self.frame,
+                text=label,
+                font=("Arial", 12, "bold"),
+                bg="#1982c4", fg="white",
+                relief="flat", padx=26, pady=8, width=10,
+                command=lambda n=n: on_select(n)
+            ).place(x=340, y=y, anchor="nw")
+
+            tk.Label(
+                self.frame,
+                text=desc,
+                font=("Arial", 11),
+                bg="white", fg="#888",
+                anchor="w", width=22
+            ).place(x=500, y=y + 4, anchor="nw")
+
+    def destroy(self):
+        self.frame.destroy()
+
+
+class GameScreen:
+    def __init__(self, root, num_disks, on_back):
+        self.root = root
+        self.num_disks = num_disks
+        self.move_count = 0
+        self.solving = False
+        self.rods = [list(range(num_disks, 0, -1)), [], []]
+        self.move_queue = []
+        self.solver = HanoiSolver()
+        self.colors = ["#ff595e", "#ffca3a", "#8ac926", "#1982c4", "#6a4c93", "#ff924c", "#00b4d8", "#9d4edd"]
+
+        self.frame = tk.Frame(root, bg="white")
+        self.frame.place(x=0, y=0, width=1000, height=620)
+
+        
+        tk.Button(
+            self.frame,
+            text="<- Bargasht",
+            font=("Arial", 11),
+            bg="#ddd", relief="flat",
+            padx=10, pady=4,
+            command=on_back
+        ).place(x=20, y=20, anchor="nw")
+
+        
+        tk.Label(
+            self.frame,
+            text="Borje- Hanoi",
+            font=("Arial", 30, "bold"),
+            bg="white"
+        ).place(x=500, y=20, anchor="n")
+
+        
+        self.move_label = tk.Label(
+            self.frame,
+            text="Harkat: 0",
+            font=("Arial", 13),
+            bg="white"
+        )
+        self.move_label.place(x=980, y=28, anchor="ne")
+
+        
+        tk.Button(
+            self.frame,
+            text="Shoru",
+            font=("Arial", 12, "bold"),
+            bg="#1982c4", fg="white",
+            relief="flat", padx=16, pady=5,
+            command=self.start
+        ).place(x=420, y=80, anchor="nw")
+
+        tk.Button(
+            self.frame,
+            text="Reset",
+            font=("Arial", 12, "bold"),
+            bg="#ff595e", fg="white",
+            relief="flat", padx=16, pady=5,
+            command=self.reset
+        ).place(x=530, y=80, anchor="nw")
+
+        
+        self.canvas = tk.Canvas(
+            self.frame,
+            width=1000, height=420,
+            bg="#f8f8f8", highlightthickness=0
+        )
+        self.canvas.place(x=0, y=145)
+
+        self.rod_x = [220, 500, 780]
+        self.base_y = 365
+        self.rod_height = 245
+        self.disk_height = 26
+        self.min_disk_width = 44
+        self.disk_step = 24
+
+        self.draw_scene()
+
+    def draw_scene(self):
+        self.canvas.delete("all")
+        self.canvas.create_line(80, self.base_y, 920, self.base_y, width=6, fill="#333")
+        for x in self.rod_x:
+            self.canvas.create_rectangle(
+                x - 6, self.base_y - self.rod_height,
+                x + 6, self.base_y,
+                fill="#654321", outline=""
+            )
+        for rod_index, rod in enumerate(self.rods):
+            x = self.rod_x[rod_index]
+            for level, disk in enumerate(rod):
+                w = self.min_disk_width + (disk - 1) * self.disk_step
+                left, right = x - w // 2, x + w // 2
+                bottom = self.base_y - level * self.disk_height
+                top = bottom - self.disk_height + 2
+                self.canvas.create_rectangle(
+                    left, top, right, bottom,
+                    fill=self.colors[disk - 1], outline="white", width=2
+                )
+                self.canvas.create_text(
+                    x, (top + bottom) / 2,
+                    text=str(disk),
+                    font=("Arial", 9, "bold"), fill="white"
+                )
+        for i, label in enumerate(["A", "B", "C"]):
+            self.canvas.create_text(
+                self.rod_x[i], self.base_y + 22,
+                text=label, font=("Arial", 15, "bold"), fill="#333"
+            )
+
+    def start(self):
+        if self.solving:
+            return
+        self.solving = True
+        self.move_queue = []
+        self.solver.solve(self.num_disks, 0, 2, 1,
+                          callback=lambda s, t: self.move_queue.append((s, t)))
+        self._animate_next()
+
+    def _animate_next(self):
+        if not self.move_queue:
+            self.solving = False
+            return
+        source, target = self.move_queue.pop(0)
+        self.rods[target].append(self.rods[source].pop())
+        self.move_count += 1
+        self.move_label.config(text=f"Harkat: {self.move_count}")
+        self.draw_scene()
+        self.root.after(300, self._animate_next)
+
+    def reset(self):
+        self.solving = False
+        self.move_queue = []
+        self.move_count = 0
+        self.rods = [list(range(self.num_disks, 0, -1)), [], []]
+        self.move_label.config(text="Harkat: 0")
+        self.draw_scene()
+
+    def destroy(self):
+        self.frame.destroy()
+
+
+class App:
+    def __init__(self, root):
+        self.root = root
+        self.current_screen = None
+        self.show_menu()
+
+    def show_menu(self):
+        if self.current_screen:
+            self.current_screen.destroy()
+        self.current_screen = MenuScreen(self.root, on_select=self.show_game)
+
+    def show_game(self, num_disks):
+        if self.current_screen:
+            self.current_screen.destroy()
+        self.current_screen = GameScreen(self.root, num_disks, on_back=self.show_menu)
+
+
+root = tk.Tk()
+root.title("Ebi Project")
+root.geometry("1000x620")
+root.resizable(False, False)
+App(root)
+root.mainloop()
